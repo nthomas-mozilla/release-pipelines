@@ -1,0 +1,134 @@
+- style:
+    node:
+      shape: oval
+    edge:
+      fontsize: "10"
+
+# relman
+- name: Approve patches for release
+  out: 
+    - node: CI creates en-US builds
+
+# automation
+- name: CI creates en-US builds
+  attrs:
+    shape: box
+  out: 
+    - node: Release promotion starts
+
+# relman
+- name: Configure ship-it v1
+  out:
+    - node: RelMan review (??)
+
+# relman
+- name: RelMan review (??)
+  out: 
+    - node: Start release
+
+# relman
+- name: Start release
+  out: 
+    - node: Release promotion starts
+
+# automation
+- name: Release promotion starts
+  attrs:
+    shape: box
+  out:
+    - node: Wait for blocking on human decision task
+    - node: Wait for all jobs green
+
+# releng
+- name: Wait for blocking on human decision task
+  out: 
+    - node: Notify release-localtest ready
+
+# releng
+- name: Notify release-localtest ready
+  out:
+    - node: QA signoff builds and test channel
+
+# qa
+- name: QA signoff builds and test channel
+  out:
+    - node: Push to cdntest request
+
+# releng
+- name: Wait for all jobs green
+  out:
+    - node: Push to cdntest request
+
+# relman
+- name: Push to cdntest request
+  out:
+    - node: Push to cdntest
+
+# releng - resolve human decision task
+- name: Push to cdntest
+  attrs:
+    shape: box
+  out:
+    - node: Notify pushed to cdntest
+
+# releng
+- name: Notify pushed to cdntest
+  out:
+    - node: QA signoff release-cdntest
+
+# qa
+- name: QA signoff release-cdntest
+  out:
+    - node: Request push to release channel
+
+# relman
+- name: Request push to release channel
+  out:
+    - node: Push to release channel
+
+# releng
+- name: Push to release channel
+  attrs:
+    shape: box
+  out:
+    - node: QA signoff for release
+    - node: Verify download pages
+    - node: Push release notes live
+    - node: Notify communications we are live
+    - node: Notify security to publish advisories
+    - node: Send announcement email
+
+# qa
+- name: QA signoff for release
+  out:
+    - node: All done
+
+# relman
+- name: Verify download pages
+  out: 
+    - node: All done
+
+# relman
+- name: Push release notes live
+  out: 
+    - node: All done
+
+# relman
+- name: Notify communications we are live
+  out: 
+    - node: All done
+
+# relman
+- name: Notify security to publish advisories
+  out: 
+    - node: All done
+
+# relman
+- name: Send announcement email
+  out: 
+    - node: All done
+
+# everyone
+- name: All done
+  attrs:
+    shape: circle
