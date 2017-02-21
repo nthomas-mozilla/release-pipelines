@@ -1,0 +1,75 @@
+- style:
+    node:
+      shape: oval
+    edge:
+      fontsize: "10"
+
+- name: Approve patches for beta
+  out: 
+    - node: CI creates en-US builds
+
+- name: CI creates en-US builds
+  attrs:
+    shape: box
+  out: 
+    - node: Release promotion starts
+
+- name: Configure ship-it v1
+  out:
+    - node: RelMan review (??)
+
+- name: RelMan review (??)
+  out: 
+    - node: Start release
+
+- name: Start release
+  out: 
+    - node: Release promotion starts
+
+- name: Release promotion starts
+  attrs:
+    shape: box
+  out:
+    - node: Wait for final verification
+    - node: Wait for all jobs green
+
+- name: Wait for final verification
+  attrs:
+    shape: box
+  out: 
+    - node: Notify beta-cdntest ready
+
+- name: Notify beta-cdntest ready
+  out:
+    - node: QA signoff
+
+- name: QA signoff
+  out:
+    - node: Push to beta channel
+
+- name: Wait for all jobs green
+  attrs:
+    shape: box
+  out:
+    - node: Push to beta channel
+
+- name: Push to beta channel
+  attrs:
+    shape: box
+  out:
+    - node: QA signoff for beta
+    - node: Run post-release tasks
+
+- name: QA signoff for beta
+  out:
+    - node: All done
+
+- name: Run post-release tasks
+  attrs:
+    shape: box
+  out: 
+    - node: All done
+
+- name: All done
+  attrs:
+    shape: circle
