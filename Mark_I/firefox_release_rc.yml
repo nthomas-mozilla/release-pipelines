@@ -1,0 +1,43 @@
+- style:
+    node:
+      shape: oval
+    edge:
+      fontsize: "10"
+
+- subgraph: Preparation
+  nodes:
+    - Request merge from Beta
+    - Merge from Beta
+    - Resolve any bustage
+
+- name: Request merge from Beta
+  out: 
+    - node: Merge from Beta
+
+- name: Merge from Beta
+  attrs:
+    shape: box
+  out: 
+    - node: Resolve any bustage
+
+- name: Resolve any bustage
+  out: 
+    - node: Configure ShipIt v1
+
+- name: Configure ShipIt v1
+  out:
+    - node: RelMan review release (??)
+
+- name: RelMan review release (??)
+  out: 
+    - node: Start release
+
+- name: Start release
+  out: 
+    - node: Generate TC Graph 1
+
+- name: Generate TC Graph 1
+  attrs:
+    shape: box
+
+# - name: Wait for final verification
