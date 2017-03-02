@@ -9,8 +9,8 @@ steps:
       is correct
     who:
       relman: 1
-  tags: null
-  upstream: null
+  tags: []
+  upstream: []
 - id: review_shipit
   name: Review release in ship-it
   url: https://signoff.mozilla-releng.org/
@@ -19,7 +19,7 @@ steps:
       match reality)
     who:
       relman: 1
-  tags: null
+  tags: []
   upstream:
   - config_shipit
 - id: start_shipit
@@ -29,7 +29,7 @@ steps:
     docstring: Click the Do eet button in ship-it
     who:
       relman: 1
-  tags: null
+  tags: []
   upstream:
   - config_shipit
 - id: approve_patches
@@ -39,8 +39,8 @@ steps:
     docstring: Approve patches for beta, and ask sheriffs to land them
     who:
       relman: 1
-  tags: null
-  upstream: null
+  tags: []
+  upstream: []
 - id: build_en-US
   name: CI builds en-US
   url: https://taskcluster.mozilla-releng.org/
@@ -68,7 +68,7 @@ steps:
       in release dir
     who:
       releng: 1
-  tags: null
+  tags: []
   upstream:
   - release_promotion
 - id: qa_signoff_beta-cdntest
@@ -78,7 +78,7 @@ steps:
     docstring: QA are happy to release the build based on functional and update tests
     who:
       qa: 1
-  tags: null
+  tags: []
   upstream:
   - ready_for_qa
 - id: ready_for_release
@@ -88,7 +88,7 @@ steps:
     docstring: RelEng confirms that the promotion graph has no errors
     who:
       releng: 1
-  tags: null
+  tags: []
   upstream:
   - release_promotion
 - id: push_to_beta
@@ -98,7 +98,7 @@ steps:
     docstring: Releng triggers the updates task to enable the new release on beta
     who:
       releng: 1
-  tags: null
+  tags: []
   upstream:
   - ready_for_release
   - qa_signoff_beta-cdntest
@@ -109,7 +109,7 @@ steps:
     docstring: QA have verified updates are working on the beta channel
     who:
       qa: 1
-  tags: null
+  tags: []
   upstream:
   - push_to_beta
 - id: postrelease_automation
@@ -129,7 +129,7 @@ steps:
     docstring: Relman satisfied all is done for release.
     who:
       relman: 1
-  tags: null
+  tags: []
   upstream:
   - postrelease_automation
   - qa_signoff_beta

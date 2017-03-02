@@ -1,0 +1,48 @@
+---
+  title: pipeline schema (v0.1)
+  type: object
+  required:
+    - name
+    - version
+    - steps
+  additionalProperties: false
+  properties:
+    name:
+      type: string
+      description: Human readable identifier for a pipeline
+      minLength: 1
+      maxLength: 100
+    version:
+      type: number
+      description: Current version of the pipeline description
+    steps:
+      type: array
+      description: A list of steps that make up the pipeline
+      items:
+        type: object
+        required:
+          - name
+          - id
+          - url
+          - params
+          - upstream
+        additionalProperties: false
+        properties:
+          id:
+            type: string
+            description: A short name to identify the step and build dependencies
+          name:
+            type: string
+            description: A longer name for display purposes
+          url:
+            type: string
+            description: A base url to the service which will handle this step
+          params:
+            type: object
+            description: A set of parameters which are passed to the service to configure it
+          tags:
+            type: array
+            description: A list of annotations for the step
+          upstream:
+            type: array
+            description: A list of steps which must complete before this one starts
