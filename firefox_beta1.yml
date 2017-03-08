@@ -1,4 +1,4 @@
-name: Firefox desktop - beta 2+
+name: Firefox desktop - beta 1
 version: 1
 schema: pipeline_schema.yml
 steps:
@@ -92,6 +92,27 @@ steps:
   tags: []
   upstream:
   - release_promotion
+- id: release_notes_staged
+  name: Release notes are staged
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelEng confirms that the promotion graph has no errors
+    who:
+      relman: 1
+  tags: []
+  upstream: []
+- id: relman_requests_beta_push
+  name: RelMan request push to beta
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelEng confirms that the promotion graph has no errors
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - automation_ready_for_release
+  - qa_signoff_beta-cdntest
+  - release_notes_staged
 - id: push_to_beta
   name: Push to beta channel
   url: https://signoff.mozilla-releng.org/
@@ -101,8 +122,7 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - automation_ready_for_release
-  - qa_signoff_beta-cdntest
+  - relman_requests_beta_push
 - id: qa_signoff_beta
   name: QA signoff beta channel
   url: https://signoff.mozilla-releng.org/
@@ -127,7 +147,7 @@ steps:
   name: Release complete
   url: https://signoff.mozilla-releng.org/
   params:
-    docstring: Relman satisfied all is done for release.
+    docstring: RelMan satisfied all is done for release.
     who:
       relman: 1
   tags: []
