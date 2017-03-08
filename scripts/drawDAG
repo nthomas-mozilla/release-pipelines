@@ -6,12 +6,31 @@ from graphviz import Digraph
 import yaml
 
 
+def get_style(step):
+    style = {}
+    if step['url'] == 'https://signoff.mozilla-releng.org/':
+        style['shape'] = 'oval'
+        style['style'] = 'filled'
+        who = step['params']['who'].keys()[0]
+        if who=='relman':
+            style['fillcolor'] = 'sienna2'
+        elif who=='releng':
+            style['fillcolor'] = 'khaki'
+        elif who=='qa':
+            style['fillcolor'] = 'lightcyan'
+        else:
+            style['fillcolor'] = 'grey80'
+    elif step['url'] == 'https://taskcluster.mozilla-releng.org/':
+        style['shape'] = 'box'
+    return style
+
+
 def add_edge(g, out, in_):
     g.edge(out, in_)
 
 
 def add_node(g, node):
-    g.node(node['id'], label=node['name'])
+    g.node(node['id'], label=node['name'], _attributes=get_style(node))
 
 
 def build(desc, g):
