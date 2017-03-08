@@ -1,0 +1,18 @@
+#! /usr/bin/env python
+import sys
+
+from jsonschema import validate
+import yaml
+
+args = sys.argv[1:]
+
+if len(args) < 1:
+  print "Pass at least one yaml file for validation"
+  sys.exit(1)
+
+for arg in args:
+   print "Processing %s" % arg
+   pipeline = yaml.load(open(arg));
+   schema = yaml.load(open(pipeline['schema']))
+   validate(pipeline, schema)
+
