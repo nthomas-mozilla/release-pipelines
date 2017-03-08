@@ -11,3 +11,12 @@ Initial setup is to create a virtualenv, eg
 
 And to validate
     scripts/validate <file1.yml> [<file2.yml> ...]
+
+
+Visualisation
+-------------
+
+You'll need graphviz installed with your package manager, and a virtualenv as above. Then
+    scripts/drawDAG <file1.yml> [<file2.yml> ...]
+
+This will create <file1.gv.pdf> etc.
