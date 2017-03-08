@@ -5,6 +5,7 @@
     - name
     - version
     - steps
+    - schema
   additionalProperties: false
   properties:
     name:
@@ -15,6 +16,9 @@
     version:
       type: number
       description: Current version of the pipeline description
+    schema:
+      type: string
+      description: pipeline schema to validate config
     steps:
       type: array
       description: A list of steps that make up the pipeline

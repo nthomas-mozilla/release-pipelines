@@ -1,6 +1,25 @@
 name: Firefox desktop - beta 2+
 version: 1
+schema: pipeline_schema.yml
 steps:
+- id: approve_patches
+  name: Approve patches in Bugzilla
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Approve patches for beta, and ask sheriffs to land them
+    who:
+      relman: 1
+  tags: []
+  upstream: []
+- id: build_en-US
+  name: CI builds en-US
+  url: https://taskcluster.mozilla-releng.org/
+  params:
+    docstring: Buildbot & TC build the en-US builds on all platforms
+  tags:
+  - automation
+  upstream:
+  - approve_patches
 - id: config_shipit
   name: Configure shipit v1
   url: https://signoff.mozilla-releng.org/
@@ -31,25 +50,7 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - config_shipit
-- id: approve_patches
-  name: Approve patches in Bugzilla
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: Approve patches for beta, and ask sheriffs to land them
-    who:
-      relman: 1
-  tags: []
-  upstream: []
-- id: build_en-US
-  name: CI builds en-US
-  url: https://taskcluster.mozilla-releng.org/
-  params:
-    docstring: Buildbot & TC build the en-US builds on all platforms
-  tags:
-  - automation
-  upstream:
-  - approve_patches
+  - review_shipit
 - id: release_promotion
   name: Release promotion
   url: https://taskcluster.mozilla-releng.org/
