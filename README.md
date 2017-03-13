@@ -21,4 +21,6 @@ You'll need graphviz installed with your package manager, and a virtualenv as ab
 
     scripts/drawDAG file1.yml [file2.yml ...]
 
-This will create `file1.gv.pdf` etc.
+This will create `file1.gv.pdf` etc. You can use `fswatch` to regenerate the pdf files whenever the yml is saved using
+
+    fswatch -e '.*' -i '\.yml$' `pwd` | xargs -n1 scripts/drawDAG

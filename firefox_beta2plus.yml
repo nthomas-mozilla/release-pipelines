@@ -103,16 +103,6 @@ steps:
   upstream:
   - automation_ready_for_release
   - qa_signoff_beta-cdntest
-- id: qa_signoff_beta
-  name: QA signoff beta channel
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: QA have verified updates are working on the beta channel
-    who:
-      qa: 1
-  tags: []
-  upstream:
-  - push_to_beta
 - id: postrelease_automation
   name: Promotion performs post-release tasks
   url: https://taskcluster.mozilla-releng.org/
@@ -121,6 +111,16 @@ steps:
       etc
   tags:
   - automation
+  upstream:
+  - push_to_beta
+- id: qa_signoff_beta
+  name: QA signoff beta channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: QA have verified updates are working on the beta channel
+    who:
+      qa: 1
+  tags: []
   upstream:
   - push_to_beta
 - id: all_done

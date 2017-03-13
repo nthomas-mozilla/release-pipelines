@@ -96,16 +96,16 @@ steps:
   name: Release notes are staged
   url: https://signoff.mozilla-releng.org/
   params:
-    docstring: RelEng confirms that the promotion graph has no errors
+    docstring: RelMan creates release notes, asks for comment, confirms staged and ready to go
     who:
       relman: 1
   tags: []
   upstream: []
 - id: relman_requests_beta_push
-  name: RelMan request push to beta
+  name: RelMan requests push to beta channel
   url: https://signoff.mozilla-releng.org/
   params:
-    docstring: RelEng confirms that the promotion graph has no errors
+    docstring: RelMan askes RelEng to push beta 1 to beta channel
     who:
       relman: 1
   tags: []
@@ -123,16 +123,6 @@ steps:
   tags: []
   upstream:
   - relman_requests_beta_push
-- id: qa_signoff_beta
-  name: QA signoff beta channel
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: QA have verified updates are working on the beta channel
-    who:
-      qa: 1
-  tags: []
-  upstream:
-  - push_to_beta
 - id: postrelease_automation
   name: Promotion performs post-release tasks
   url: https://taskcluster.mozilla-releng.org/
@@ -143,6 +133,46 @@ steps:
   - automation
   upstream:
   - push_to_beta
+- id: check_download_pages
+  name: Check download pages
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Verify that https://www.mozilla.org/en-US/firefox/channel/desktop/ and https://www.mozilla.org/en-US/firefox/beta/all/ offer the right verssion
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - postrelease_automation
+- id: qa_signoff_beta
+  name: QA signoff beta channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: QA have verified updates are working on the beta channel
+    who:
+      qa: 1
+  tags: []
+  upstream:
+  - push_to_beta
+- id: push_release_notes
+  name: Push release notes
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan switches release notes to public
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - relman_requests_beta_push
+- id: verify_release_notes
+  name: Verify release notes
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Verify release notes pushed and have correct content
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - push_release_notes
 - id: all_done
   name: Release complete
   url: https://signoff.mozilla-releng.org/
@@ -152,5 +182,6 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - postrelease_automation
+  - check_download_pages
   - qa_signoff_beta
+  - verify_release_notes
