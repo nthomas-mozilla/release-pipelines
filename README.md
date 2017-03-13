@@ -5,7 +5,7 @@ Validation
 ----------
 
 Initial setup is to create a virtualenv, eg
- ```virutalenv venv
+    virutalenv venv
     . venv/bin/activate
     pip install -r requirements.txt
 
