@@ -1,0 +1,227 @@
+name: Firefox desktop - release chemspill/point
+version: 1
+schema: pipeline_schema.yml
+steps:
+- id: approve_patches
+  name: Approve patches in Bugzilla
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Approve patches for release, and ask sheriffs to land them
+    who:
+      relman: 1
+  tags: []
+  upstream: []
+- id: build_en-US
+  name: CI builds en-US
+  url: https://taskcluster.mozilla-releng.org/
+  params:
+    docstring: Buildbot & TC build the en-US builds on all platforms
+  tags:
+  - automation
+  upstream:
+  - approve_patches
+- id: config_shipit
+  name: Configure shipit v1
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Go to ship-it and enter the version, verify other data (as prefilled)
+      is correct
+    who:
+      relman: 1
+  tags: []
+  upstream: []
+- id: review_shipit
+  name: Review release in ship-it
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Another RelMan checks parameters are correct (this probably doesn't
+      match reality)
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - config_shipit
+- id: start_shipit
+  name: Start release in ship-it
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Click the Do eet button in ship-it
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - review_shipit
+- id: release_promotion
+  name: Release promotion
+  url: https://taskcluster.mozilla-releng.org/
+  params:
+    docstring: Release promotion generates other release artifacts and runs tests
+  tags:
+  - automation
+  upstream:
+  - start_shipit
+  - build_en-US
+- id: ready_for_qa
+  name: Announce release-localtest is ready
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Wait for final_verification job to indicate that all binaries are available
+      in release dir
+    who:
+      releng: 1
+  tags: []
+  upstream:
+  - release_promotion
+- id: qa_signoff_release-localtest
+  name: QA signoff builds & release-localtest channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: QA are happy to release the build based on functional and update tests
+    who:
+      qa: 1
+  tags: []
+  upstream:
+  - ready_for_qa
+- id: automation_ready_for_release
+  name: All promotion tasks are done
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelEng confirms that the promotion graph has no errors  XXX update
+    who:
+      releng: 1
+  tags: []
+  upstream:
+  - release_promotion
+- id: release_notes_staged
+  name: Release notes are staged
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan creates/updates release notes, confirms staged and ready to go
+    who:
+      relman: 1
+  tags: []
+  upstream: []
+- id: relman_requests_release-cdntest_push
+  name: RelMan request push to release-cdntest
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan askes RelEng to push the point release to release-cdntest channel
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - automation_ready_for_release
+  - qa_signoff_release-localtest
+- id: push_to_release-cdntest
+  name: Push to release-cdntest channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Releng triggers the updates task to enable the new release on release, annnounces on r-d
+    who:
+      releng: 1
+  tags: []
+  upstream:
+  - relman_requests_release-cdntest_push
+- id: qa_signoff_release-cdntest
+  name: QA signoff for release-cdntest channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: QA are happy with updates on the release-cdntest channel
+    who:
+      qa: 1
+  tags: []
+  upstream:
+  - push_to_release-cdntest
+- id: relman_requests_release_push
+  name: RelMan request push to release
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan askes RelEng to push the point release to release-cdntest channel
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - qa_signoff_release-cdntest
+  - release_notes_staged
+- id: push_to_release
+  name: Push to release channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Releng triggers the updates task to enable the new release on release
+    who:
+      releng: 1
+  tags: []
+  upstream:
+  - relman_requests_release_push
+- id: postrelease_automation
+  name: Promotion performs post-release tasks
+  url: https://taskcluster.mozilla-releng.org/
+  params:
+    docstring: Release promotion marks release done in ship-it, bumps version in repo,
+      etc
+  tags:
+  - automation
+  upstream:
+  - push_to_release
+- id: check_download_pages
+  name: Check download pages
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Verify that https://www.mozilla.org/en-US/firefox/channel/desktop/ and https://www.mozilla.org/en-US/firefox/all/ offer the right verssion
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - postrelease_automation
+- id: qa_signoff_release
+  name: QA signoff release channel
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: QA have verified updates are working on the release channel
+    who:
+      qa: 1
+  tags: []
+  upstream:
+  - push_to_release
+- id: push_release_notes
+  name: Push release notes
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan switches release notes to public
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - relman_requests_release_push
+- id: verify_release_notes
+  name: Verify release notes
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Verify release notes have security info, known issues fixed or carried over, new Mozillian thank you added
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - push_release_notes
+- id: make_announcements
+  name: Make announcements
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan informs PMM to push blog posts/press releases, security to push advisories, send announcement email
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - check_download_pages
+  - qa_signoff_release
+  - verify_release_notes
+- id: all_done
+  name: Release complete
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan satisfied all is done for release.
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - make_announcements
