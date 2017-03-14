@@ -2,17 +2,17 @@ name: Firefox desktop - release candidate (version X.0)
 version: 1
 schema: pipeline_schema.yml
 steps:
-- id: request_merge_from_beta
-  name: Request merge from beta
+- id: signoff_merge_from_beta
+  name: Merge from beta
   url: https://signoff.mozilla-releng.org/
   params:
-    docstring: RelMan requests mozilla-beta repo be merged to mozilla-release
+    docstring: RelMan confirms we're ready for mozilla-beta repo be merged to mozilla-release
     who:
       relman: 1
   tags: []
   upstream: []
 - id: merge_from_beta
-  name: Merge from beta
+  name: Run migration script
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng runs script to merge code up to mozilla-release
@@ -20,7 +20,7 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - request_merge_from_beta
+  - signoff_merge_from_beta
 - id: build_en-US
   name: CI builds en-US
   url: https://taskcluster.mozilla-releng.org/
@@ -82,7 +82,7 @@ steps:
   upstream:
   - release_promotion
 - id: qa_signoff_beta-cdntest
-  name: QA signoff builds & beta-cdntest channel
+  name: builds & beta-cdntest channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy to release the build to beta based on functional and update tests
@@ -101,8 +101,8 @@ steps:
   tags: []
   upstream:
   - release_promotion
-- id: relman_requests_beta_push
-  name: RelMan request push to beta
+- id: relman_signoff_beta_push
+  name: Release to beta channel
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan askes RelEng to push the RC to the beta channel
@@ -121,9 +121,9 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - relman_requests_beta_push
+  - relman_signoff_beta_push
 - id: qa_signoff_beta
-  name: QA signoff for beta channel
+  name: beta channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy with updates on the beta channel
@@ -133,7 +133,7 @@ steps:
   upstream:
   - push_to_beta
 - id: qa_signoff_release_localtest
-  name: QA signoff for builds & release-localtest channel
+  name: builds & release-localtest channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy with builds and updates on the release-localtest channel
@@ -152,8 +152,8 @@ steps:
   tags: []
   upstream:
   - release_promotion
-- id: relman_requests_release-cdntest_push
-  name: RelMan request push to release-cdntest
+- id: relman_signoff_release-cdntest_push
+  name: Copy to firefox/releases/
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan askes RelEng to push the point release to release-cdntest channel
@@ -172,7 +172,7 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - relman_requests_release-cdntest_push
+  - relman_signoff_release-cdntest_push
 - id: release_promotion_2
   name: Release promotion graph 2
   url: https://taskcluster.mozilla-releng.org/
@@ -194,7 +194,7 @@ steps:
   upstream:
   - release_promotion_2
 - id: qa_signoff_release-cdntest
-  name: QA signoff for release-cdntest channel
+  name: release-cdntest channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy with updates on the release-cdntest channel
@@ -212,8 +212,8 @@ steps:
       relman: 1
   tags: []
   upstream: []
-- id: relman_requests_release_push
-  name: RelMan request push to release
+- id: relman_signoff_release_push
+  name: Push to release channel @ 25%
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan askes RelEng to push the point release to release-cdntest channel
@@ -224,7 +224,7 @@ steps:
   - qa_signoff_release-cdntest
   - release_notes_staged
 - id: push_to_release
-  name: Push to release channel @ 25%
+  name: Balrog rules updated
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Releng triggers the updates task to enable the new release on release
@@ -232,7 +232,7 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - relman_requests_release_push
+  - relman_signoff_release_push
 - id: postrelease_automation
   name: Promotion performs post-release tasks
   url: https://taskcluster.mozilla-releng.org/
@@ -254,7 +254,7 @@ steps:
   upstream:
   - postrelease_automation
 - id: qa_signoff_release
-  name: QA signoff release channel
+  name: release channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA have verified updates are working on the release channel
@@ -272,7 +272,7 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - relman_requests_release_push
+  - relman_signoff_release_push
 - id: verify_release_notes
   name: Verify release notes
   url: https://signoff.mozilla-releng.org/
@@ -305,8 +305,8 @@ steps:
   tags: []
   upstream:
   - make_announcements
-- id: request_unthrottle_updates
-  name: Request unthrottling of updates (if all well)
+- id: signoff_unthrottle_updates
+  name: Unthrottling of updates (if all well)
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan determins OK to unthrottle updates if no regressions in functionality or crashiness
@@ -316,7 +316,7 @@ steps:
   upstream:
   - throttle_updates
 - id: unthrottle_updates
-  name: Unthrottle updates
+  name: Balrog rules update
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan determins OK to unthrottle updates
@@ -324,7 +324,7 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - request_unthrottle_updates
+  - signoff_unthrottle_updates
 - id: all_done
   name: Release complete
   url: https://signoff.mozilla-releng.org/
