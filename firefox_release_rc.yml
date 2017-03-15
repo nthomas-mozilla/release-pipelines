@@ -1,4 +1,4 @@
-name: Firefox desktop - release candidate (version X.0)
+name: Firefox desktop - release candidate (app version is X.0)
 version: 1
 schema: pipeline_schema.yml
 steps:
@@ -81,7 +81,7 @@ steps:
   upstream:
   - ready_for_beta-cdntest_qa
 - id: automation_ready_for_beta
-  name: Beta promotion tasks done
+  name: Check for failures
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors for beta jobs. XXX More info here
@@ -121,7 +121,7 @@ steps:
   tags: []
   upstream:
   - push_to_beta
-- id: qa_signoff_release_localtest
+- id: qa_signoff_release-localtest
   name: builds & release-localtest OK
   url: https://signoff.mozilla-releng.org/
   params:
@@ -132,7 +132,7 @@ steps:
   upstream:
   - release_promotion
 - id: automation_ready_for_release
-  name: Release promotion tasks done
+  name: Check for failures
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors for release jobs. XXX More info here
@@ -151,9 +151,9 @@ steps:
   tags: []
   upstream:
   - automation_ready_for_release
-  - qa_signoff_release_localtest
+  - qa_signoff_release-localtest
 - id: push_to_release-cdntest
-  name: Create graph 2 and trigger
+  name: Create graph 2 and trigger, release-cdntest is available
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Releng creates 2nd taskcluster graph and triggers it
@@ -162,17 +162,6 @@ steps:
   tags: []
   upstream:
   - relman_signoff_release-cdntest_push
-- id: ready_for_release-cdntest_qa
-  name: release-cdntest is available
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: Wait for release final_verification job to indicate that all binaries are available for release
-      in release dir
-    who:
-      releng: 1
-  tags: []
-  upstream:
-  - push_to_release-cdntest
 - id: qa_signoff_release-cdntest
   name: release-cdntest OK
   url: https://signoff.mozilla-releng.org/
@@ -182,7 +171,7 @@ steps:
       qa: 1
   tags: []
   upstream:
-  - ready_for_release-cdntest_qa
+  - push_to_release-cdntest
 - id: release_notes_staged
   name: Release notes staged
   url: https://signoff.mozilla-releng.org/
@@ -335,3 +324,4 @@ steps:
   tags: []
   upstream:
   - unthrottle_updates
+  - security_advisories_pushed

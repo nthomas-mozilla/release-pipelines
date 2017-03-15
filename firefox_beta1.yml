@@ -2,15 +2,25 @@ name: Firefox desktop - beta 1
 version: 1
 schema: pipeline_schema.yml
 steps:
-- id: approve_patches
-  name: Approve patches in Bugzilla
+- id: signoff_merge_from_aurora
+  name: Merge from aurora
   url: https://signoff.mozilla-releng.org/
   params:
-    docstring: Approve patches for beta, and ask sheriffs to land them
+    docstring: RelMan confirms we're ready for mozilla-beta repo be merged to mozilla-release
     who:
       relman: 1
   tags: []
   upstream: []
+- id: merge_from_aurora
+  name: Run migration script
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelEng runs script to merge code up to mozilla-release
+    who:
+      releng: 1
+  tags: []
+  upstream:
+  - signoff_merge_from_aurora
 - id: build_en-US
   name: CI builds en-US
   url: https://taskcluster.mozilla-releng.org/
@@ -19,9 +29,9 @@ steps:
   tags:
   - automation
   upstream:
-  - approve_patches
+  - merge_from_aurora
 - id: config_shipit
-  name: Configure shipit v1
+  name: Configure ship-it v1
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Go to ship-it and enter the version, verify other data (as prefilled)
@@ -30,19 +40,8 @@ steps:
       relman: 1
   tags: []
   upstream: []
-- id: review_shipit
-  name: Review release in ship-it
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: Another RelMan checks parameters are correct (this probably doesn't
-      match reality)
-    who:
-      relman: 1
-  tags: []
-  upstream:
-  - config_shipit
 - id: start_shipit
-  name: Start release in ship-it
+  name: Start release in ship-it v1
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Click the Do eet button in ship-it
@@ -50,7 +49,7 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - review_shipit
+  - config_shipit
 - id: release_promotion
   name: Release promotion
   url: https://taskcluster.mozilla-releng.org/
@@ -62,7 +61,7 @@ steps:
   - start_shipit
   - build_en-US
 - id: ready_for_qa
-  name: Announce beta-cdntest is ready
+  name: beta-cdntest available
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Wait for final_verification job to indicate that all binaries are available
@@ -73,7 +72,7 @@ steps:
   upstream:
   - release_promotion
 - id: qa_signoff_beta-cdntest
-  name: QA signoff builds and beta-cdntest channel
+  name: builds and beta-cdntest channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy to release the build based on functional and update tests
@@ -83,7 +82,7 @@ steps:
   upstream:
   - ready_for_qa
 - id: automation_ready_for_release
-  name: All promotion tasks are done
+  name: Check for failures
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors
@@ -93,7 +92,7 @@ steps:
   upstream:
   - release_promotion
 - id: release_notes_staged
-  name: Release notes are staged
+  name: Release notes staged
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan creates release notes, asks for comment, confirms staged and ready to go
@@ -101,8 +100,8 @@ steps:
       relman: 1
   tags: []
   upstream: []
-- id: relman_requests_beta_push
-  name: RelMan requests push to beta channel
+- id: relman_signoff_beta_push
+  name: Push to beta
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan askes RelEng to push beta 1 to beta channel
@@ -114,7 +113,7 @@ steps:
   - qa_signoff_beta-cdntest
   - release_notes_staged
 - id: push_to_beta
-  name: Push to beta channel
+  name: Balrog rules updated
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Releng triggers the updates task to enable the new release on beta
@@ -122,7 +121,7 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - relman_requests_beta_push
+  - relman_signoff_beta_push
 - id: postrelease_automation
   name: Promotion performs post-release tasks
   url: https://taskcluster.mozilla-releng.org/
@@ -144,7 +143,7 @@ steps:
   upstream:
   - postrelease_automation
 - id: qa_signoff_beta
-  name: QA signoff beta channel
+  name: beta channel OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA have verified updates are working on the beta channel
@@ -162,7 +161,7 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - relman_requests_beta_push
+  - relman_signoff_beta_push
 - id: verify_release_notes
   name: Verify release notes
   url: https://signoff.mozilla-releng.org/
