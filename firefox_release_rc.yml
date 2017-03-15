@@ -31,7 +31,7 @@ steps:
   upstream:
   - merge_from_beta
 - id: config_shipit
-  name: Configure shipit v1
+  name: Configure ship-it v1
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Go to ship-it and enter the version, verify other data (as prefilled)
@@ -40,19 +40,8 @@ steps:
       relman: 1
   tags: []
   upstream: []
-- id: review_shipit
-  name: Review release in ship-it
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: Another RelMan checks parameters are correct (this probably doesn't
-      match reality)
-    who:
-      relman: 1
-  tags: []
-  upstream:
-  - config_shipit
 - id: start_shipit
-  name: Start release in ship-it
+  name: Start release in ship-it v1
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Click the Do eet button in ship-it
@@ -60,7 +49,7 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - review_shipit
+  - config_shipit
 - id: release_promotion
   name: Release promotion
   url: https://taskcluster.mozilla-releng.org/
@@ -72,7 +61,7 @@ steps:
   - start_shipit
   - build_en-US
 - id: ready_for_beta-cdntest_qa
-  name: Announce beta-cdntest is ready
+  name: beta-cdntest is available
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Wait for beta final_verification job to indicate that all binaries are available for beta
@@ -82,7 +71,7 @@ steps:
   upstream:
   - release_promotion
 - id: qa_signoff_beta-cdntest
-  name: builds & beta-cdntest channel OK
+  name: builds & beta-cdntest OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy to release the build to beta based on functional and update tests
@@ -92,7 +81,7 @@ steps:
   upstream:
   - ready_for_beta-cdntest_qa
 - id: automation_ready_for_beta
-  name: Beta promotion tasks are done
+  name: Beta promotion tasks done
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors for beta jobs. XXX More info here
@@ -102,7 +91,7 @@ steps:
   upstream:
   - release_promotion
 - id: relman_signoff_beta_push
-  name: Release to beta channel
+  name: Push to beta channel
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan askes RelEng to push the RC to the beta channel
@@ -113,7 +102,7 @@ steps:
   - automation_ready_for_beta
   - qa_signoff_beta-cdntest
 - id: push_to_beta
-  name: Push to beta channel
+  name: Trigger push to beta
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Releng triggers the updates task to enable the new release on beta, annnounces on r-d
@@ -123,7 +112,7 @@ steps:
   upstream:
   - relman_signoff_beta_push
 - id: qa_signoff_beta
-  name: beta channel OK
+  name: beta OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy with updates on the beta channel
@@ -133,7 +122,7 @@ steps:
   upstream:
   - push_to_beta
 - id: qa_signoff_release_localtest
-  name: builds & release-localtest channel OK
+  name: builds & release-localtest OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy with builds and updates on the release-localtest channel
@@ -141,9 +130,9 @@ steps:
       qa: 1
   tags: []
   upstream:
-  - qa_signoff_beta
+  - release_promotion
 - id: automation_ready_for_release
-  name: Release promotion tasks are done
+  name: Release promotion tasks done
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors for release jobs. XXX More info here
@@ -164,7 +153,7 @@ steps:
   - automation_ready_for_release
   - qa_signoff_release_localtest
 - id: push_to_release-cdntest
-  name: Create promotion graph 2 and trigger
+  name: Create graph 2 and trigger
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Releng creates 2nd taskcluster graph and triggers it
@@ -173,17 +162,8 @@ steps:
   tags: []
   upstream:
   - relman_signoff_release-cdntest_push
-- id: release_promotion_2
-  name: Release promotion graph 2
-  url: https://taskcluster.mozilla-releng.org/
-  params:
-    docstring: Release promotion which will push to release channel
-  tags:
-  - automation
-  upstream:
-  - push_to_release-cdntest
 - id: ready_for_release-cdntest_qa
-  name: Announce release-cdntest is ready
+  name: release-cdntest is available
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Wait for release final_verification job to indicate that all binaries are available for release
@@ -192,9 +172,9 @@ steps:
       releng: 1
   tags: []
   upstream:
-  - release_promotion_2
+  - push_to_release-cdntest
 - id: qa_signoff_release-cdntest
-  name: release-cdntest channel OK
+  name: release-cdntest OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: QA are happy with updates on the release-cdntest channel
@@ -204,7 +184,7 @@ steps:
   upstream:
   - ready_for_release-cdntest_qa
 - id: release_notes_staged
-  name: Release notes are staged
+  name: Release notes staged
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan creates/updates release notes, confirms staged and ready to go
@@ -212,8 +192,17 @@ steps:
       relman: 1
   tags: []
   upstream: []
+- id: security_advisories_staged
+  name: Security advisories staged
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Sec team has written the security advisories
+    who:
+      security: 1
+  tags: []
+  upstream: []
 - id: relman_signoff_release_push
-  name: Push to release channel @ 25%
+  name: Push to release @ 25%
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan askes RelEng to push the point release to release-cdntest channel
@@ -223,6 +212,7 @@ steps:
   upstream:
   - qa_signoff_release-cdntest
   - release_notes_staged
+  - security_advisories_staged
 - id: push_to_release
   name: Balrog rules updated
   url: https://signoff.mozilla-releng.org/
@@ -234,7 +224,7 @@ steps:
   upstream:
   - relman_signoff_release_push
 - id: postrelease_automation
-  name: Promotion performs post-release tasks
+  name: post-release tasks
   url: https://taskcluster.mozilla-releng.org/
   params:
     docstring: Release promotion marks release done in ship-it, bumps version in repo,
@@ -295,6 +285,16 @@ steps:
   - check_download_pages
   - qa_signoff_release
   - verify_release_notes
+- id: security_advisories_pushed
+  name: Security advisories pushed
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Sec team has pushed the security advisories
+    who:
+      security: 1
+  tags: []
+  upstream:
+  - make_announcements
 - id: throttle_updates
   name: Throttle updates after 24h
   url: https://signoff.mozilla-releng.org/
@@ -306,7 +306,7 @@ steps:
   upstream:
   - make_announcements
 - id: signoff_unthrottle_updates
-  name: Unthrottling of updates (if all well)
+  name: Unthrottle updates
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelMan determins OK to unthrottle updates if no regressions in functionality or crashiness

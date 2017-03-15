@@ -5,6 +5,13 @@ import sys
 from graphviz import Digraph
 import yaml
 
+fill_colours = {
+    'relman': 'sienna2',
+    'releng': 'khaki',
+    'qa': 'lightcyan',
+    'security': 'darkseagreen2',
+    'default': 'grey80',
+}
 
 def get_style(step):
     style = {}
@@ -12,14 +19,7 @@ def get_style(step):
         style['shape'] = 'oval'
         style['style'] = 'filled'
         who = step['params']['who'].keys()[0]
-        if who=='relman':
-            style['fillcolor'] = 'sienna2'
-        elif who=='releng':
-            style['fillcolor'] = 'khaki'
-        elif who=='qa':
-            style['fillcolor'] = 'lightcyan'
-        else:
-            style['fillcolor'] = 'grey80'
+        style['fillcolor'] = fill_colours.get(who or default)
     elif step['url'] == 'https://taskcluster.mozilla-releng.org/':
         style['shape'] = 'box'
     return style
