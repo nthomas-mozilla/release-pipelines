@@ -100,6 +100,16 @@ steps:
       relman: 1
   tags: []
   upstream: []
+- id: push_release_notes
+  name: Push release notes
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan switches release notes to public
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - release_notes_staged
 - id: relman_signoff_beta_push
   name: Push to beta
   url: https://signoff.mozilla-releng.org/
@@ -111,7 +121,7 @@ steps:
   upstream:
   - automation_ready_for_release
   - qa_signoff_beta-cdntest
-  - release_notes_staged
+  - push_release_notes
 - id: push_to_beta
   name: Balrog rules updated
   url: https://signoff.mozilla-releng.org/
@@ -152,16 +162,6 @@ steps:
   tags: []
   upstream:
   - push_to_beta
-- id: push_release_notes
-  name: Push release notes
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: RelMan switches release notes to public
-    who:
-      relman: 1
-  tags: []
-  upstream:
-  - relman_signoff_beta_push
 - id: verify_release_notes
   name: Verify release notes
   url: https://signoff.mozilla-releng.org/
@@ -171,7 +171,7 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - push_release_notes
+  - postrelease_automation
 - id: all_done
   name: Release complete
   url: https://signoff.mozilla-releng.org/

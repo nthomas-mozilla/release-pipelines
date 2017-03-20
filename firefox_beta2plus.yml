@@ -102,6 +102,16 @@ steps:
   - automation
   upstream:
   - push_to_beta
+- id: check_download_pages
+  name: Check download pages
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Verify that https://www.mozilla.org/en-US/firefox/channel/desktop/ and https://www.mozilla.org/en-US/firefox/beta/all/ offer the right verssion
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - postrelease_automation
 - id: qa_signoff_beta
   name: beta channel OK
   url: https://signoff.mozilla-releng.org/
@@ -121,5 +131,5 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - postrelease_automation
+  - check_download_pages
   - qa_signoff_beta

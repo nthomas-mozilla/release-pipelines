@@ -90,6 +90,16 @@ steps:
       relman: 1
   tags: []
   upstream: []
+- id: push_release_notes
+  name: Push release notes
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: RelMan switches release notes to public
+    who:
+      relman: 1
+  tags: []
+  upstream:
+  - release_notes_staged
 - id: security_advisories_staged
   name: Security advisories staged
   url: https://signoff.mozilla-releng.org/
@@ -99,6 +109,16 @@ steps:
       security: 1
   tags: []
   upstream: []
+- id: security_advisories_pushed
+  name: Security advisories pushed
+  url: https://signoff.mozilla-releng.org/
+  params:
+    docstring: Sec team has pushed the security advisories
+    who:
+      security: 1
+  tags: []
+  upstream:
+  - security_advisories_staged
 - id: relman_signoff_release-cdntest_push
   name: Copy to firefox/releases/
   url: https://signoff.mozilla-releng.org/
@@ -140,8 +160,8 @@ steps:
   tags: []
   upstream:
   - qa_signoff_release-cdntest
-  - release_notes_staged
-  - security_advisories_staged
+  - push_release_notes
+  - security_advisories_pushed
 - id: push_to_release
   name: Balrog rules updated
   url: https://signoff.mozilla-releng.org/
@@ -182,18 +202,8 @@ steps:
   tags: []
   upstream:
   - push_to_release
-- id: push_release_notes
-  name: Push release notes
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: RelMan switches release notes to public
-    who:
-      relman: 1
-  tags: []
-  upstream:
-  - relman_signoff_release_push
 - id: verify_release_notes
-  name: Verify release notes
+  name: Verify release notes and security advisories
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: Verify release notes have security info, known issues fixed or carried over, new Mozillian thank you added
@@ -201,12 +211,12 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - push_release_notes
+  - postrelease_automation
 - id: make_announcements
   name: Make announcements
   url: https://signoff.mozilla-releng.org/
   params:
-    docstring: RelMan informs PMM to push blog posts/press releases, security to push advisories, send announcement email
+    docstring: RelMan informs PMM to push blog posts/press releases, send announcement email
     who:
       relman: 1
   tags: []
@@ -214,16 +224,6 @@ steps:
   - check_download_pages
   - qa_signoff_release
   - verify_release_notes
-- id: security_advisories_pushed
-  name: Security advisories pushed
-  url: https://signoff.mozilla-releng.org/
-  params:
-    docstring: Sec team has pushed the security advisories
-    who:
-      security: 1
-  tags: []
-  upstream:
-  - make_announcements
 - id: all_done
   name: Release complete
   url: https://signoff.mozilla-releng.org/
@@ -233,4 +233,4 @@ steps:
       relman: 1
   tags: []
   upstream:
-  - security_advisories_pushed
+  - make_announcements
