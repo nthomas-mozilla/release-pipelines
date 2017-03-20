@@ -81,7 +81,7 @@ steps:
   upstream:
   - ready_for_beta-cdntest_qa
 - id: automation_ready_for_beta
-  name: Check for failures
+  name: automation OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors for beta jobs. XXX More info here
@@ -132,7 +132,7 @@ steps:
   upstream:
   - release_promotion
 - id: automation_ready_for_release
-  name: Check for failures
+  name: automation OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors for release jobs. XXX More info here

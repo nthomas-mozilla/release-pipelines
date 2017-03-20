@@ -72,7 +72,7 @@ steps:
   upstream:
   - ready_for_qa
 - id: automation_ready_for_release
-  name: Check for failures
+  name: automation OK
   url: https://signoff.mozilla-releng.org/
   params:
     docstring: RelEng confirms that the promotion graph has no errors  XXX update
@@ -173,7 +173,7 @@ steps:
   upstream:
   - relman_signoff_release_push
 - id: postrelease_automation
-  name: Promotion performs post-release tasks
+  name: post-release tasks
   url: https://taskcluster.mozilla-releng.org/
   params:
     docstring: Release promotion marks release done in ship-it, bumps version in repo,
